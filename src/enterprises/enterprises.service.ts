@@ -1,26 +1,107 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEnterpriseDto } from './dto/create-enterprise.dto';
 import { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Enterprise, Transfer } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class EnterprisesService {
-  create(createEnterpriseDto: CreateEnterpriseDto) {
-    return 'This action adds a new enterprise';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createEnterpriseDto: CreateEnterpriseDto): Promise<Enterprise> {
+    try {
+      return await this.prisma.enterprise.create({
+        data: createEnterpriseDto,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new Error(`Prisma error: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all enterprises`;
+  async findAll(): Promise<Enterprise[]> {
+    return await this.prisma.enterprise.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} enterprise`;
+  async findOne(id: string): Promise<Enterprise | null> {
+    return await this.prisma.enterprise.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updateEnterpriseDto: UpdateEnterpriseDto) {
-    return `This action updates a #${id} enterprise`;
+  async update(
+    id: string,
+    updateEnterpriseDto: UpdateEnterpriseDto,
+  ): Promise<Enterprise | null> {
+    try {
+      return await this.prisma.enterprise.update({
+        where: { id },
+        data: {
+          ...updateEnterpriseDto,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new Error(`Prisma error: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} enterprise`;
+  async remove(id: string): Promise<Enterprise> {
+    try {
+      return await this.prisma.enterprise.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new Error(`Prisma error: ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  async getEnterpriseTransfers(id: string): Promise<Transfer[]> {
+    const enterprise = await this.prisma.enterprise.findUnique({
+      where: { id },
+      include: { transfers: true },
+    });
+    return enterprise?.transfers || [];
+  }
+
+  async getEnterprisesWithRecentTransfers(): Promise<Enterprise[]> {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    return await this.prisma.enterprise.findMany({
+      where: {
+        transfers: {
+          some: {
+            createdAt: {
+              gte: oneMonthAgo,
+            },
+          },
+        },
+      },
+      include: {
+        transfers: true,
+      },
+    });
+  }
+
+  async getEnterprisesCreatedLastMonth(): Promise<Enterprise[]> {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    return await this.prisma.enterprise.findMany({
+      where: {
+        createdAt: {
+          gte: oneMonthAgo,
+        },
+      },
+    });
   }
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { EnterprisesService } from './enterprises.service';
 import { CreateEnterpriseDto } from './dto/create-enterprise.dto';
 import { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
@@ -17,18 +25,31 @@ export class EnterprisesController {
     return this.enterprisesService.findAll();
   }
 
+  @Get('recent-transfers')
+  getEnterprisesWithRecentTransfers() {
+    return this.enterprisesService.getEnterprisesWithRecentTransfers();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.enterprisesService.findOne(+id);
+    return this.enterprisesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEnterpriseDto: UpdateEnterpriseDto) {
-    return this.enterprisesService.update(+id, updateEnterpriseDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateEnterpriseDto: UpdateEnterpriseDto,
+  ) {
+    return this.enterprisesService.update(id, updateEnterpriseDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.enterprisesService.remove(+id);
+    return this.enterprisesService.remove(id);
+  }
+
+  @Get(':id/transfers')
+  getEnterpriseTransfers(@Param('id') id: string) {
+    return this.enterprisesService.getEnterpriseTransfers(id);
   }
 }
