@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEnterpriseDto } from './dto/create-enterprise.dto';
 import { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Enterprise, Transfer } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
