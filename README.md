@@ -92,7 +92,6 @@ Por cuestiones de tiempo y experiencia, **la Lambda Function no fue implementada
 
 - La API se ejecuta localmente, sin contenedores ni despliegue en la nube.  
 - Cumple con los requisitos funcionales y pruebas unitarias/e2e.  
-- Diseño teórico de AWS Lambda disponible para ampliaciones futuras.
 
 ---
 
